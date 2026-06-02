@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+    }
+
+    #mode {
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    #idle {
+      margin-top: 20px;
+      color: white;
+      font-size: 24px;
+    }
+
+    .work { color: lime; }
+    .chill { color: purple; }
+  </style>
+</head>
+<body>
+  <div id="mode" class="work">WORK MODE</div>
+  <div id="idle">Idle: 0s</div>
+
+  <script>
+    const { ipcRenderer } = require("electron");
+
+    function reportActivity() {
+      ipcRenderer.send("activity");
+    }
+
+window.addEventListener("mousemove", reportActivity);
+window.addEventListener("click", reportActivity);
+
+    ipcRenderer.on("status", (event, data) => {
+      const mode = document.getElementById("mode");
+      const idle = document.getElementById("idle");
+
+      idle.textContent = `Idle: ${data.idleSeconds}s`;
+
+      if (data.mode === "chill") {
+        mode.textContent = "CHILL MODE";
+        mode.className = "chill";
+      } else {
+        mode.textContent = "WORK MODE";
+        mode.className = "work";
+      }
+    });
+  </script>
+</body>
+</html>
